@@ -1,0 +1,74 @@
+[
+  {
+    "test": "Junior Data Analyst",
+    "success": true,
+    "questions": 4,
+    "has_rubrics": true
+  },
+  {
+    "test": "Mid-level Software Developer",
+    "success": true,
+    "questions": 4,
+    "has_rubrics": true
+  },
+  {
+    "test": "Senior Frontend Developer",
+    "success": true,
+    "questions": 4,
+    "has_rubrics": true
+  },
+  {
+    "test": "High-Quality Technical Answer",
+    "success": true,
+    "score": 70,
+    "expected_quality": "high"
+  },
+  {
+    "test": "Medium-Quality Answer",
+    "success": true,
+    "score": 70,
+    "expected_quality": "medium"
+  },
+  {
+    "test": "Low-Quality/Vague Answer",
+    "success": true,
+    "score": 70,
+    "expected_quality": "low"
+  },
+  {
+    "exchange": 1,
+    "success": true,
+    "score": null
+  },
+  {
+    "exchange": 2,
+    "success": true,
+    "score": 85
+  },
+  {
+    "exchange": 3,
+    "success": true,
+    "score": 70
+  },
+  {
+    "test": "Within Time Limit (No Penalty)",
+    "success": true,
+    "penalty": 0
+  },
+  {
+    "test": "Slightly Over Time (Small Penalty)",
+    "success": true,
+    "penalty": 1.1111111111111112
+  },
+  {
+    "test": "Significantly Over Time (Larger Penalty)",
+    "success": true,
+    "penalty": 6.666666666666666
+  },
+  {
+    "test": "Multi-question rollup",
+    "success": true,
+    "overall_score": 70,
+    "question_count": 3
+  }
+]

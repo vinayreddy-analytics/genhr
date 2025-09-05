@@ -1,0 +1,104 @@
+{
+  "data_analyst": {
+    "name": "Data Analyst",
+    "core_skills": ["Python", "SQL", "Excel", "Statistics", "Data Visualization", "Pandas", "Tableau"],
+    "tools": ["Jupyter", "Power BI", "R", "SPSS", "Google Analytics"],
+    "scenario_contexts": ["e-commerce", "healthcare", "finance", "marketing", "retail", "manufacturing"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "How would you clean a dataset with missing values?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "How would you detect and handle outliers in customer purchase data?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design an end-to-end analytics pipeline for real-time customer behavior tracking.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "software_developer": {
+    "name": "Software Developer",
+    "core_skills": ["JavaScript", "Python", "Node.js", "React", "API Design", "Git", "Testing", "Databases"],
+    "tools": ["VS Code", "Docker", "AWS", "MongoDB", "PostgreSQL", "Redis"],
+    "scenario_contexts": ["web-application", "api-development", "microservices", "database-design", "system-integration"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "Explain the difference between let, const, and var in JavaScript.",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "How would you design a scalable user authentication system?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a distributed system architecture for handling millions of users.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "frontend_developer": {
+    "name": "Frontend Developer",
+    "core_skills": ["JavaScript", "React", "CSS", "HTML", "TypeScript", "Redux", "Responsive Design"],
+    "tools": ["VS Code", "Webpack", "Git", "Chrome DevTools", "Figma", "Jest"],
+    "scenario_contexts": ["e-commerce-site", "dashboard-application", "mobile-responsive", "performance-optimization", "user-experience"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "How do you ensure your website works across different browsers?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "How would you optimize a React application that's loading slowly?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a micro-frontend architecture for a large-scale application.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  }
+}
