@@ -30,6 +30,17 @@ export default function AIInterviewConversational() {
     experience: '',
     skills: ''
   });
+  // Add this useEffect near the top with other hooks
+useEffect(() => {
+  if (stage === 'complete') {
+    // Auto-redirect after 3 seconds
+    const timer = setTimeout(() => {
+      router.push('/candidate-dashboard');
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }
+}, [stage, router]);
   
   // Start the conversational interview
   const startInterview = async () => {

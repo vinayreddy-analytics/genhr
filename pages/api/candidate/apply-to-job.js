@@ -43,11 +43,12 @@ function calculateJobCandidateMatch(job, candidate, candidateInterview) {
   }
 
   // 2. Skills matching (50% weight)
+// 2. Skills matching (50% weight)
+  let skillMatches = 0; // Move this outside the if block
+  const jobSkills = job.required_skills ? job.required_skills.map(s => s.toLowerCase().trim()) : [];
+
   if (job.required_skills && candidateInterview?.competency_scores) {
-    const jobSkills = job.required_skills.map(s => s.toLowerCase().trim());
     const candidateSkills = Object.keys(candidateInterview.competency_scores).map(s => s.toLowerCase().replace('_', ' '));
-    
-    let skillMatches = 0;
     let skillMatchDetails = [];
     
     jobSkills.forEach(jobSkill => {

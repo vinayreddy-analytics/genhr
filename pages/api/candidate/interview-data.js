@@ -226,6 +226,7 @@ export default async function handler(req, res) {
         competency_scores: latestInterview.competency_scores || {},
         strengths: latestInterview.strengths || [],
         areas_for_improvement: latestInterview.areas_for_improvement || [],
+        matching_keywords: latestInterview.matching_keywords || [],
         interview_date: latestInterview.completed_at || new Date(),
         verification_id: latestInterview._id.toString().slice(-12).toUpperCase(),
         interview_duration_minutes: latestInterview.interview_duration_minutes || 30

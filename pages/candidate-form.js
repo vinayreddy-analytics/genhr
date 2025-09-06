@@ -1,6 +1,7 @@
-// Updated CandidateForm.jsx — removed location field & improved preferred cities UI
+// Updated CandidateForm.jsx — Modern styling to match landing page
 import { useState } from 'react';
 import axios from 'axios';
+import Link from 'next/link';
 
 export default function CandidateForm() {
   const [form, setForm] = useState({
@@ -164,198 +165,375 @@ const handleSubmit = async e => {
   const summary = `${form.fullName || '[Name]'} is looking for a ${form.jobTitle || '[Role]'} with ${form.experience || '0'} years of experience.`;
 
   return (
-    <div style={{ maxWidth: '700px', margin: '0 auto', fontFamily: 'Arial' }}>
-      <div style={{ position: 'sticky', top: 0, background: 'white', zIndex: 1000, paddingTop: '10px', marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '28px', marginBottom: '10px' }}>Candidate Form</h1>
-        <div style={{ background: '#eee', height: '20px', borderRadius: '5px' }}>
-          <div style={{ width: `${progress}%`, background: 'green', height: '100%', borderRadius: '5px', textAlign: 'center', color: 'white' }}>{progress}%</div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Header with Logo and Back Link */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-700 transition-colors mb-6">
+            <span className="text-xl">←</span>
+            <span className="font-medium">Back to Home</span>
+          </Link>
+          
+          <div className="mb-6 flex items-center justify-center">
+            <h1 className="text-4xl sm:text-5xl font-extrabold">
+              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Gen
+              </span>
+              <span className="bg-gradient-to-r from-emerald-500 to-teal-600 bg-clip-text text-transparent">
+                HR
+              </span>
+            </h1>
+          </div>
+          
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Join as a Candidate</h2>
+          <p className="text-gray-600 text-lg">Complete your profile and let AI find your perfect role</p>
         </div>
-      </div>
 
-      {submitted ? (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <h2 style={{ color: 'green', fontSize: '24px' }}>✅ Thank you for submitting your details!</h2>
-          <p>Our AI system will now analyze your profile and connect you to the most suitable roles.</p>
+        {/* Progress Bar - Sticky */}
+        <div className="sticky top-0 bg-white/80 backdrop-blur-sm z-50 rounded-xl p-4 mb-8 shadow-lg border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-700">Profile Completion</span>
+            <span className="text-sm font-bold text-indigo-600">{progress}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-3">
+            <div 
+              className="bg-gradient-to-r from-indigo-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
 
-          {[
-            ['Full Name', 'fullName'], ['Email', 'email'], ['Password', 'password', 'password'],
-            ['Confirm Password', 'confirmPassword', 'password'], ['Job Title', 'jobTitle'],
-            ['Preferred Role', 'preferredRole'],
-            ['Total Experience (years)', 'experience'], ['Skills (e.g., Python, SQL)', 'skills'],
-            ['Expected Salary (£)', 'expectedSalary'], ['Contact Email', 'contactEmail'],
-            ['LinkedIn (optional)', 'linkedin'], ['GitHub (optional)', 'github'],
-            ['Birth Year', 'birthYear', 'number'], ['Degree', 'degree'],
-            ['University', 'university'], ['Graduation Year', 'graduationYear'],
-            ['Previous HR Email (optional)', 'previousHrEmail']
-          ].map(([label, name, type = 'text']) => (
-            <div key={name} style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>{label}:</label>
-              <input
-                name={name}
-                type={type}
-                value={form[name] || ''}
-                onChange={handleChange}
-                style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-              />
+        {submitted ? (
+          <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-3xl">✅</span>
             </div>
-          ))}
-
-          {[['Job Type', 'jobType', ['Full-time', 'Part-time', 'Contract', 'Internship']],
-            ['Skill Level (optional)', 'skillLevel', ['Beginner', 'Intermediate', 'Advanced']],
-            ['Gender (optional)', 'gender', ['Prefer not to say', 'Male', 'Female', 'Non-binary', 'Other']],
-            ['Sexuality (optional)', 'sexuality', ['Prefer not to say', 'Heterosexual', 'Homosexual', 'Bisexual', 'Asexual', 'Other']],
-            ['Visa Status (optional)', 'visaStatus', ['Student Visa', 'Graduate Visa', 'Skilled Worker Visa', 'Dependent Visa', 'None']]
-          ].map(([label, name, options]) => (
-            <div key={name} style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '5px' }}>{label}:</label>
-              <select
-                name={name}
-                value={form[name] || ''}
-                onChange={handleChange}
-                style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-              >
-                <option value="">Select {label.toLowerCase()}</option>
-                {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-              </select>
-            </div>
-          ))}
-
-          {/* Current Location */}
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block' }}>Current City:</label>
-            <input
-              name="currentLocation"
-              value={form.currentLocation || ''}
-              onChange={handleChange}
-              placeholder="E.g. London"
-              style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-            />
+            <h2 className="text-2xl font-bold text-green-600 mb-4">Thank you for submitting your details!</h2>
+            <p className="text-gray-600 text-lg mb-6">Our AI system will now analyze your profile and connect you to the most suitable roles.</p>
+            <div className="animate-spin w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full mx-auto"></div>
+            <p className="text-sm text-gray-500 mt-4">Redirecting to your dashboard...</p>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-8">
 
-          {/* Desired Locations */}
-          <div style={{ marginBottom: '25px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Preferred Cities (up to 5):</label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              {form.desiredLocations.map((loc, i) => (
-                <input
-                  key={i}
-                  name={`desiredLocation_${i}`}
-                  placeholder={`City ${i + 1}`}
-                  value={loc}
-                  onChange={handleChange}
-                  style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
-                />
-              ))}
-            </div>
-            <small style={{ color: 'gray' }}>* Leave all blank if you're comfortable relocating anywhere in the UK.</small>
-          </div>
-
-          {/* Govt ID Upload */}
-          <div style={{ marginBottom: '15px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block' }}>Govt ID Upload (optional):</label>
-            <input type="file" name="govtId" accept=".pdf,image/*" onChange={handleChange} />
-          </div>
-
-          {/* Work Experience */}
-          <div>
-            <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginTop: '30px', marginBottom: '10px' }}>Work Experience</h2>
-            {form.workExperience.map((exp, index) => (
-              <div key={index} style={{ marginBottom: '20px' }}>
-                {[['Company', 'company'], ['Start Date', 'startDate', 'date'], ['End Date', 'endDate', 'date'], ['Reason for Gap (optional)', 'reasonForGap']].map(([label, name, type = 'text']) => (
-                  <div key={name} style={{ marginBottom: '10px' }}>
-                    <label style={{ fontWeight: 'bold', display: 'block' }}>{label}:</label>
+            {/* Personal Information Section */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-sm">1</span>
+                Personal Information
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  ['Full Name', 'fullName'], 
+                  ['Email', 'email', 'email'], 
+                  ['Password', 'password', 'password'],
+                  ['Confirm Password', 'confirmPassword', 'password'],
+                  ['Contact Email', 'contactEmail', 'email'],
+                  ['Birth Year', 'birthYear', 'number']
+                ].map(([label, name, type = 'text']) => (
+                  <div key={name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{label}:</label>
                     <input
+                      name={name}
                       type={type}
-                      value={exp[name]}
-                      onChange={e => handleChange(e, index, name)}
-                      style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                      value={form[name] || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                      placeholder={`Enter your ${label.toLowerCase()}`}
                     />
                   </div>
                 ))}
               </div>
-            ))}
-            <button type="button" onClick={addExperience} style={{ background: '#007bff', color: 'white', padding: '8px 16px', borderRadius: '5px', border: 'none', cursor: 'pointer', marginBottom: '20px' }}>
-              Add Experience
-            </button>
-          </div>
+            </div>
 
-          {/* Consent Checkbox */}
-          <div style={{ marginTop: '25px', marginBottom: '20px' }}>
-            <label>
-              <input
-                type="checkbox"
-                name="consent"
-                checked={form.consent}
-                onChange={handleChange}
-              />{' '}
-              I agree to the T&Cs, data usage, and confirm this AI interview reflects my honest responses.
-            </label>
-          </div>
+            {/* Professional Information Section */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-sm">2</span>
+                Professional Information
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  ['Current Job Title', 'jobTitle'], 
+                  ['Preferred Role', 'preferredRole'],
+                  ['Total Experience (years)', 'experience', 'number'], 
+                  ['Expected Salary (£)', 'expectedSalary', 'number']
+                ].map(([label, name, type = 'text']) => (
+                  <div key={name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{label}:</label>
+                    <input
+                      name={name}
+                      type={type}
+                      value={form[name] || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                      placeholder={`Enter your ${label.toLowerCase()}`}
+                    />
+                  </div>
+                ))}
+              </div>
 
-          {/* Summary */}
-          <div style={{ background: '#f9f9f9', padding: '10px', borderRadius: '5px', fontSize: '14px', color: '#333', marginBottom: '20px' }}>
-            <p>{summary}</p>
-            <p>Expected salary: £{form.expectedSalary || '--'}, Skills: {form.skills || '--'}</p>
-          </div>
+              <div className="mt-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Skills (e.g., Python, SQL, React):</label>
+                <textarea
+                  name="skills"
+                  value={form.skills || ''}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                  placeholder="List your key skills separated by commas"
+                />
+              </div>
 
-          <button type="submit" style={{ background: 'green', color: 'white', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer', border: 'none' }}>
-            Submit
-          </button>
-        </form>
-      )}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                {[
+                  ['Job Type', 'jobType', ['Full-time', 'Part-time', 'Contract', 'Internship']],
+                  ['Skill Level', 'skillLevel', ['Beginner', 'Intermediate', 'Advanced']],
+                  ['Visa Status', 'visaStatus', ['Student Visa', 'Graduate Visa', 'Skilled Worker Visa', 'Dependent Visa', 'UK Citizen', 'None']]
+                ].map(([label, name, options]) => (
+                  <div key={name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{label}:</label>
+                    <select
+                      name={name}
+                      value={form[name] || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                    >
+                      <option value="">Select {label.toLowerCase()}</option>
+                      {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Education Section */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-bold text-sm">3</span>
+                Education
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[
+                  ['Degree', 'degree'], 
+                  ['University', 'university'],
+                  ['Graduation Year', 'graduationYear', 'number']
+                ].map(([label, name, type = 'text']) => (
+                  <div key={name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{label}:</label>
+                    <input
+                      name={name}
+                      type={type}
+                      value={form[name] || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                      placeholder={`Enter your ${label.toLowerCase()}`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Location Preferences */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">4</span>
+                Location Preferences
+              </h3>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Current City:</label>
+                <input
+                  name="currentLocation"
+                  value={form.currentLocation || ''}
+                  onChange={handleChange}
+                  placeholder="E.g. London, Manchester, Birmingham"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Cities (up to 5):</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {form.desiredLocations.map((loc, i) => (
+                    <input
+                      key={i}
+                      name={`desiredLocation_${i}`}
+                      placeholder={`City ${i + 1}`}
+                      value={loc}
+                      onChange={handleChange}
+                      className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                    />
+                  ))}
+                </div>
+                <p className="text-sm text-gray-500 mt-2">Leave blank if you're open to relocating anywhere in the UK</p>
+              </div>
+            </div>
+
+            {/* Work Experience Section */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm">5</span>
+                Work Experience
+              </h3>
+              
+              {form.workExperience.map((exp, index) => (
+                <div key={index} className="border border-gray-200 rounded-xl p-6 mb-6 bg-gray-50">
+                  <h4 className="font-semibold text-gray-800 mb-4">Experience {index + 1}</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      ['Company', 'company'], 
+                      ['Start Date', 'startDate', 'date'], 
+                      ['End Date', 'endDate', 'date']
+                    ].map(([label, name, type = 'text']) => (
+                      <div key={name}>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">{label}:</label>
+                        <input
+                          type={type}
+                          value={exp[name]}
+                          onChange={e => handleChange(e, index, name)}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Reason for Gap (optional):</label>
+                    <input
+                      type="text"
+                      value={exp.reasonForGap}
+                      onChange={e => handleChange(e, index, 'reasonForGap')}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                      placeholder="E.g. Career break, study, travel"
+                    />
+                  </div>
+                </div>
+              ))}
+              
+              <button 
+                type="button" 
+                onClick={addExperience} 
+                className="flex items-center gap-2 px-6 py-3 bg-indigo-100 text-indigo-700 font-medium rounded-xl hover:bg-indigo-200 transition-colors duration-200"
+              >
+                <span className="text-xl">+</span>
+                Add Another Experience
+              </button>
+            </div>
+
+            {/* Optional Information */}
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <span className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-bold text-sm">6</span>
+                Optional Information
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">LinkedIn Profile:</label>
+                  <input
+                    name="linkedin"
+                    value={form.linkedin || ''}
+                    onChange={handleChange}
+                    placeholder="https://linkedin.com/in/yourprofile"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">GitHub Profile:</label>
+                  <input
+                    name="github"
+                    value={form.github || ''}
+                    onChange={handleChange}
+                    placeholder="https://github.com/yourusername"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Previous HR Email:</label>
+                  <input
+                    name="previousHrEmail"
+                    value={form.previousHrEmail || ''}
+                    onChange={handleChange}
+                    placeholder="hr@previouscompany.com"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Government ID Upload:</label>
+                  <input 
+                    type="file" 
+                    name="govtId" 
+                    accept=".pdf,image/*" 
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                {[
+                  ['Gender', 'gender', ['Prefer not to say', 'Male', 'Female', 'Non-binary', 'Other']],
+                  ['Sexuality', 'sexuality', ['Prefer not to say', 'Heterosexual', 'Homosexual', 'Bisexual', 'Asexual', 'Other']]
+                ].map(([label, name, options]) => (
+                  <div key={name}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">{label} (optional):</label>
+                    <select
+                      name={name}
+                      value={form[name] || ''}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                    >
+                      <option value="">Select {label.toLowerCase()}</option>
+                      {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Profile Summary */}
+            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Profile Summary</h3>
+              <div className="bg-white rounded-xl p-4 mb-4">
+                <p className="text-gray-700">{summary}</p>
+                <p className="text-gray-600 mt-2">Expected salary: £{form.expectedSalary || '--'} • Skills: {form.skills || 'Not specified'}</p>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  name="consent"
+                  checked={form.consent}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                />
+                <label className="text-sm text-gray-700">
+                  I agree to the Terms & Conditions, data usage policy, and confirm this AI interview reflects my honest responses.
+                </label>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="text-center">
+              <button 
+                type="submit" 
+                className="w-full sm:w-auto px-12 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 text-lg"
+              >
+                Complete Registration
+              </button>
+              <p className="text-sm text-gray-500 mt-4">Your profile will be analyzed by AI to find the best matches</p>
+            </div>
+
+          </form>
+        )}
+      </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
