@@ -1,5 +1,5 @@
 // pages/api/recruiter/dashboard-data.js
-// Fetches real recruiter dashboard data with job postings and candidate matches
+// FIXED: Enhanced matching algorithm with role filtering and proper skill detection
 
 import { MongoClient, ObjectId } from 'mongodb';
 
@@ -25,67 +25,385 @@ async function connectToDatabase() {
   }
 }
 
-// Basic job matching algorithm - will enhance this in Phase 3
-function calculateJobCandidateMatch(job, candidate, candidateInterview) {
-  let score = 0;
-  let matchDetails = [];
+// ENHANCED MATCHING ALGORITHM WITH ROLE FILTERING
 
-  // 1. Experience matching (30% weight)
-  const jobExpRequired = parseInt(job.experience) || 0;
-  const candidateExp = candidate.experience_years || 0;
+// Role standardization mapping
+const ROLE_MAPPINGS = {
+  'data analyst': 'data_analyst',
+  'business analyst': 'business_analyst', 
+  'financial analyst': 'financial_analyst',
+  'data scientist': 'data_scientist',
+  'data engineer': 'data_engineer',
+  'software developer': 'software_developer',
+  'frontend developer': 'frontend_developer',
+  'backend developer': 'backend_developer',
+  'full stack developer': 'software_developer',
+  'project manager': 'project_manager',
+  'technical project manager': 'technical_project_manager',
+  'sales manager': 'sales_manager',
+  'sales executive': 'sales_executive',
+  'retail store manager': 'retail_store_manager',
+  'customer care representative': 'customer_care_representative',
+  'mechanical engineer': 'mechanical_engineer',
+  'design technician': 'design_technician',
+  'drafting technician': 'design_technician',
+  'cad technician': 'design_technician'
+};
+
+// Role compatibility matrix
+const ROLE_COMPATIBILITY = {
+  'data_analyst': ['data_analyst', 'business_analyst'],
+  'business_analyst': ['business_analyst', 'data_analyst'], 
+  'design_technician': ['design_technician', 'mechanical_engineer'],
+  'mechanical_engineer': ['mechanical_engineer', 'design_technician'],
+  'sales_manager': ['sales_manager', 'sales_executive'],
+  'sales_executive': ['sales_executive', 'sales_manager'],
+  'software_developer': ['software_developer', 'frontend_developer', 'backend_developer'],
+  'frontend_developer': ['frontend_developer', 'software_developer'],
+  'backend_developer': ['backend_developer', 'software_developer'],
+  'project_manager': ['project_manager', 'technical_project_manager'],
+  'technical_project_manager': ['technical_project_manager', 'project_manager']
+};
+
+function standardizeRole(roleString) {
+  if (!roleString) return null;
+  const normalized = roleString.toLowerCase().trim();
+  return ROLE_MAPPINGS[normalized] || normalized.replace(/[\s-]+/g, '_');
+}
+
+function rolesAreCompatible(jobRole, candidateRole) {
+  if (!jobRole || !candidateRole) return false;
   
-  if (candidateExp >= jobExpRequired) {
-    score += 30;
-    matchDetails.push(`Experience: ${candidateExp}/${jobExpRequired} years ✓`);
-  } else {
-    const expScore = Math.max(0, (candidateExp / jobExpRequired) * 30);
-    score += expScore;
-    matchDetails.push(`Experience: ${candidateExp}/${jobExpRequired} years (${Math.round(expScore)}%)`);
-  }
+  const jobRoleStd = standardizeRole(jobRole);
+  const candidateRoleStd = standardizeRole(candidateRole);
+  
+  // Exact match (highest priority)
+  if (jobRoleStd === candidateRoleStd) return true;
+  
+  // Check compatibility matrix  
+  const compatibleRoles = ROLE_COMPATIBILITY[jobRoleStd] || [jobRoleStd];
+  return compatibleRoles.includes(candidateRoleStd);
+}
 
-  // 2. Skills matching (50% weight)
-  if (job.required_skills && candidateInterview?.competency_scores) {
-    const jobSkills = job.required_skills.map(s => s.toLowerCase().trim());
-    const candidateSkills = Object.keys(candidateInterview.competency_scores).map(s => s.toLowerCase().replace('_', ' '));
+// Enhanced skill matching that checks ALL possible skill sources
+function calculateEnhancedSkillMatch(jobSkills, candidateInterview) {
+  if (!jobSkills || jobSkills.length === 0) {
+    return { score: 80, details: ['No specific skills required'], matched: 0, total: 0 };
+  }
+  
+  if (!candidateInterview) {
+    return { score: 0, details: ['No interview data'], matched: 0, total: jobSkills.length };
+  }
+  
+  // Get all possible skill sources from candidate interview
+  const matchingKeywords = candidateInterview.matching_keywords || [];
+  const competencyScores = candidateInterview.competency_scores || {};
+  const areasForImprovement = candidateInterview.areas_for_improvement || [];
+  
+  let totalScore = 0;
+  let matchDetails = [];
+  let skillsMatched = 0;
+  
+  console.log(`   Checking skills for candidate. Available keywords: ${matchingKeywords}, competencies: ${Object.keys(competencyScores)}`);
+  
+  for (const jobSkill of jobSkills) {
+    const jobSkillLower = jobSkill.toLowerCase().trim();
+    let skillScore = 0;
+    let matchSource = '';
     
-    let skillMatches = 0;
-    let skillMatchDetails = [];
+    // Method 1: Direct match in matching_keywords (HIGHEST PRIORITY - this fixes Vamsi!)
+    const directKeywordMatch = matchingKeywords.find(keyword => 
+      keyword.toLowerCase() === jobSkillLower ||
+      keyword.toLowerCase().includes(jobSkillLower) ||
+      jobSkillLower.includes(keyword.toLowerCase())
+    );
     
-    jobSkills.forEach(jobSkill => {
-      const matchingSkill = candidateSkills.find(candidateSkill => 
-        candidateSkill.includes(jobSkill) || jobSkill.includes(candidateSkill)
-      );
+    if (directKeywordMatch) {
+      skillScore = 90; // High score for direct skill match
+      matchSource = 'exact match';
+      skillsMatched++;
+      matchDetails.push(`${jobSkill}: 90/100 (${directKeywordMatch} - exact match)`);
+    }
+    // Method 2: Check areas for improvement (candidate mentioned but needs work)
+    else if (areasForImprovement.some(area => 
+      area.toLowerCase().includes(jobSkillLower) || jobSkillLower.includes(area.toLowerCase())
+    )) {
+      skillScore = 65; // Lower but still positive score
+      matchSource = 'area for improvement'; 
+      skillsMatched++;
+      matchDetails.push(`${jobSkill}: 65/100 (mentioned, needs development)`);
+    }
+    // Method 3: Map to competency categories (FALLBACK)
+    else {
+      const skillToCompetency = {
+        'python': 'technical_skills',
+        'sql': 'technical_skills',
+        'excel': 'technical_skills', 
+        'tableau': 'technical_skills',
+        'power bi': 'technical_skills',
+        'autocad': 'technical_skills',
+        'solidworks': 'technical_skills', 
+        'revit': 'technical_skills',
+        'salesforce': 'technical_skills',
+        'jira': 'technical_skills',
+        'javascript': 'technical_skills',
+        'react': 'technical_skills'
+      };
       
-      if (matchingSkill) {
-        skillMatches++;
-        const skillKey = Object.keys(candidateInterview.competency_scores).find(key => 
-          key.toLowerCase().replace('_', ' ').includes(jobSkill)
-        );
-        const skillScore = candidateInterview.competency_scores[skillKey] || 0;
-        skillMatchDetails.push(`${jobSkill}: ${skillScore}/100`);
+      const competencyKey = skillToCompetency[jobSkillLower];
+      if (competencyKey && competencyScores[competencyKey]) {
+        skillScore = Math.round(competencyScores[competencyKey] * 0.6); // 60% of competency score
+        matchSource = 'competency category';
+        skillsMatched++;
+        matchDetails.push(`${jobSkill}: ${skillScore}/100 (${competencyKey})`);
+      } else {
+        matchDetails.push(`${jobSkill}: No match found`);
       }
-    });
+    }
     
-    const skillMatchPercentage = jobSkills.length > 0 ? (skillMatches / jobSkills.length) * 50 : 0;
-    score += skillMatchPercentage;
-    matchDetails.push(`Skills: ${skillMatches}/${jobSkills.length} matched (${Math.round(skillMatchPercentage)}%)`);
-    matchDetails.push(...skillMatchDetails);
+    totalScore += skillScore;
+    console.log(`   Skill "${jobSkill}": ${skillScore} points (${matchSource})`);
   }
-
-  // 3. Overall interview rating (20% weight)
-  if (candidateInterview?.overall_rating) {
-    const ratingScore = (candidateInterview.overall_rating / 100) * 20;
-    score += ratingScore;
-    matchDetails.push(`Interview Rating: ${candidateInterview.overall_rating}/100 (${Math.round(ratingScore)}%)`);
-  }
-
+  
+  const averageScore = jobSkills.length > 0 ? Math.round(totalScore / jobSkills.length) : 0;
+  
   return {
-    score: Math.round(score),
-    matchDetails,
-    hasInterview: !!candidateInterview,
-    verified: !!(candidate.linkedin || candidate.github)
+    score: averageScore,
+    details: matchDetails,
+    matched: skillsMatched,
+    total: jobSkills.length
   };
 }
+
+// MAIN ENHANCED MATCHING FUNCTION
+function calculateJobCandidateMatch(job, candidate, candidateInterview) {
+  console.log(`\n🔍 MATCHING: ${candidate.email || candidate.name} for "${job.title}"`);
+  
+  let totalScore = 0;
+  let matchDetails = [];
+  
+  // STEP 1: MANDATORY ROLE FILTERING (65% weight)
+  const jobRole = standardizeRole(job.title);
+  const candidateRole = candidateInterview?.role ? standardizeRole(candidateInterview.role) : null;
+  
+  console.log(`   Job: "${jobRole}", Candidate: "${candidateRole}"`);
+  
+  if (!candidateRole) {
+    return {
+      score: 0,
+      matchDetails: ['❌ No candidate role data'],
+      hasInterview: !!candidateInterview,
+      verified: !!(candidate.linkedin || candidate.github)
+    };
+  }
+  
+  if (!rolesAreCompatible(jobRole, candidateRole)) {
+    console.log(`   ❌ ROLE MISMATCH: ${candidateRole} ≠ ${jobRole}`);
+    return {
+      score: 0,
+      matchDetails: [`❌ Role mismatch: Looking for ${jobRole}, candidate is ${candidateRole}`],
+      hasInterview: !!candidateInterview,
+      verified: !!(candidate.linkedin || candidate.github)
+    };
+  }
+  
+  // Role compatibility score
+  const exactMatch = standardizeRole(jobRole) === standardizeRole(candidateRole);
+  const roleScore = exactMatch ? 65 : 50; // 65 for exact, 50 for compatible
+  totalScore += roleScore;
+  matchDetails.push(`✅ Role: ${candidateRole} ${exactMatch ? '(exact match)' : '(compatible)'} → ${roleScore}/65`);
+  
+  // STEP 2: ENHANCED SKILL MATCHING (25% weight)
+  const skillMatch = calculateAdvancedSkillMatch(job.required_skills, candidateInterview);
+  const skillScore = Math.round((skillMatch.score / 100) * 25);
+  totalScore += skillScore;
+  matchDetails.push(`🔧 Skills: ${skillMatch.matched}/${skillMatch.total} matched → ${skillScore}/25`);
+  
+  // Add top 3 skill details
+  if (skillMatch.details.length > 0) {
+    matchDetails.push(...skillMatch.details.slice(0, 3));
+  }
+  
+  // STEP 3: EXPERIENCE MATCHING (10% weight)
+  const jobExp = parseInt(job.experience) || 0;
+  const candidateExp = candidate.experience_years || 0;
+  
+  let expScore = 0;
+  if (candidateExp >= jobExp) {
+    expScore = 10;
+    matchDetails.push(`📅 Experience: ${candidateExp}/${jobExp} years ✅ → 10/10`);
+  } else if (candidateExp >= jobExp * 0.5) {
+    expScore = 6;
+    matchDetails.push(`📅 Experience: ${candidateExp}/${jobExp} years ⚠️ → 6/10`);
+  } else {
+    expScore = Math.max(2, Math.round((candidateExp / Math.max(1, jobExp)) * 10));
+    matchDetails.push(`📅 Experience: ${candidateExp}/${jobExp} years ❌ → ${expScore}/10`);
+  }
+  totalScore += expScore;
+  
+  const finalScore = Math.min(100, Math.round(totalScore));
+  
+  console.log(`   🎯 FINAL SCORE: ${finalScore}% (Role:${roleScore} + Skills:${skillScore} + Exp:${expScore})`);
+  
+  return {
+    score: finalScore,
+    matchDetails,
+    hasInterview: !!candidateInterview,
+    verified: !!(candidate.linkedin || candidate.github),
+    breakdown: {
+      role_score: roleScore,
+      skill_score: skillScore,
+      experience_score: expScore,
+      role_compatible: true
+    }
+  };
+}
+// SPECIFIC UPDATE FOR: pages/api/recruiter/dashboard-data.js
+// Add these functions AFTER your existing calculateJobCandidateMatch function
+
+// ENHANCED SKILL MATCHING WITH SYNONYM SUPPORT
+function calculateAdvancedSkillMatch(jobSkills, candidateInterview) {
+  if (!jobSkills || jobSkills.length === 0) {
+    return { score: 80, details: ['No specific skills required'], matched: 0, total: 0 };
+  }
+  
+  if (!candidateInterview) {
+    return { score: 0, details: ['No interview data'], matched: 0, total: jobSkills.length };
+  }
+  
+  // NEW: Try enhanced skills first (Phase 2)
+  const enhancedSkills = candidateInterview.enhanced_skills;
+  if (enhancedSkills && enhancedSkills.verified_skills) {
+    return calculateSkillMatchFromVerifiedSkills(jobSkills, enhancedSkills);
+  }
+  
+  // FALLBACK: Use old system for backward compatibility
+  return calculateLegacySkillMatch(jobSkills, candidateInterview);
+}
+
+function calculateSkillMatchFromVerifiedSkills(jobSkills, enhancedSkills) {
+  const verifiedSkills = enhancedSkills.verified_skills || [];
+  const searchableTags = enhancedSkills.searchable_tags || [];
+  
+  let totalScore = 0;
+  let matchDetails = [];
+  let skillsMatched = 0;
+  
+  console.log(`   Using enhanced skills: ${verifiedSkills.length} verified skills`);
+  
+  for (const jobSkill of jobSkills) {
+    const jobSkillLower = jobSkill.toLowerCase().trim();
+    let skillScore = 0;
+    let matchType = '';
+    
+    // METHOD 1: Direct skill match (HIGHEST PRIORITY - 100% score)
+    const directMatch = verifiedSkills.find(skill => 
+      skill.skill === jobSkillLower ||
+      skill.skill.replace('_', ' ') === jobSkillLower ||
+      skill.display_name.toLowerCase() === jobSkillLower
+    );
+    
+    if (directMatch) {
+      skillScore = Math.min(100, directMatch.score + 10);
+      matchType = 'exact match';
+      skillsMatched++;
+      matchDetails.push(`${jobSkill}: ${skillScore}/100 (${directMatch.display_name} - exact match)`);
+    }
+    // METHOD 2: Synonym match
+    else {
+      const synonymMatch = verifiedSkills.find(skill => 
+        skill.synonyms && skill.synonyms.some(synonym => 
+          synonym.toLowerCase().includes(jobSkillLower) || 
+          jobSkillLower.includes(synonym.toLowerCase())
+        )
+      );
+      
+      if (synonymMatch) {
+        skillScore = Math.round(synonymMatch.score * 0.9);
+        matchType = 'synonym match';
+        skillsMatched++;
+        matchDetails.push(`${jobSkill}: ${skillScore}/100 (${synonymMatch.display_name} via synonym)`);
+      } else {
+        matchDetails.push(`${jobSkill}: No match found`);
+      }
+    }
+    
+    totalScore += skillScore;
+  }
+  
+  const averageScore = jobSkills.length > 0 ? Math.round(totalScore / jobSkills.length) : 0;
+  
+  return {
+    score: averageScore,
+    details: matchDetails,
+    matched: skillsMatched,
+    total: jobSkills.length,
+    algorithm: 'enhanced_v2.0'
+  };
+}
+
+function calculateLegacySkillMatch(jobSkills, candidateInterview) {
+  // This is your EXISTING skill matching logic - copy it exactly from your current calculateJobCandidateMatch function
+  const matchingKeywords = candidateInterview.matching_keywords || [];
+  const competencyScores = candidateInterview.competency_scores || {};
+  const areasForImprovement = candidateInterview.areas_for_improvement || [];
+  
+  let totalScore = 0;
+  let matchDetails = [];
+  let skillsMatched = 0;
+  
+  for (const jobSkill of jobSkills) {
+    const jobSkillLower = jobSkill.toLowerCase().trim();
+    let skillScore = 0;
+    
+    const directKeywordMatch = matchingKeywords.find(keyword => 
+      keyword.toLowerCase() === jobSkillLower ||
+      keyword.toLowerCase().includes(jobSkillLower) ||
+      jobSkillLower.includes(keyword.toLowerCase())
+    );
+    
+    if (directKeywordMatch) {
+      skillScore = 90;
+      skillsMatched++;
+      matchDetails.push(`${jobSkill}: 90/100 (${directKeywordMatch} - legacy match)`);
+    } else if (areasForImprovement.some(area => 
+      area.toLowerCase().includes(jobSkillLower) || jobSkillLower.includes(area.toLowerCase())
+    )) {
+      skillScore = 65;
+      skillsMatched++;
+      matchDetails.push(`${jobSkill}: 65/100 (area for improvement)`);
+    } else {
+      const skillToCompetency = {
+        'python': 'technical_skills', 'sql': 'technical_skills', 'excel': 'technical_skills',
+        'tableau': 'technical_skills', 'power bi': 'technical_skills', 'autocad': 'technical_skills',
+        'solidworks': 'technical_skills', 'revit': 'technical_skills'
+      };
+      
+      const competencyKey = skillToCompetency[jobSkillLower];
+      if (competencyKey && competencyScores[competencyKey]) {
+        skillScore = Math.round(competencyScores[competencyKey] * 0.6);
+        skillsMatched++;
+        matchDetails.push(`${jobSkill}: ${skillScore}/100 (${competencyKey})`);
+      } else {
+        matchDetails.push(`${jobSkill}: No match found`);
+      }
+    }
+    
+    totalScore += skillScore;
+  }
+  
+  const averageScore = jobSkills.length > 0 ? Math.round(totalScore / jobSkills.length) : 0;
+  
+  return {
+    score: averageScore,
+    details: matchDetails,
+    matched: skillsMatched,
+    total: jobSkills.length,
+    algorithm: 'legacy_v1.0'
+  };
+}
+
+
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -129,7 +447,7 @@ export default async function handler(req, res) {
 
     console.log(`👥 Found ${candidates.length} candidates, ${interviews.length} completed interviews`);
 
-    // Step 4: Calculate matches for each job
+    // Step 4: Calculate matches for each job using ENHANCED algorithm
     const jobsWithMatches = jobs.map(job => {
       const candidateMatches = candidates
         .map(candidate => {
@@ -148,10 +466,11 @@ export default async function handler(req, res) {
             linkedin: candidate.linkedin || null,
             github: candidate.github || null,
             interviewDate: candidateInterview?.completed_at || null,
-            overallRating: candidateInterview?.overall_rating || null
+            overallRating: candidateInterview?.overall_rating || null,
+            role: candidateInterview?.role || 'Not specified'
           };
         })
-        .filter(candidate => candidate.score > 20) // Only show candidates with >20% match
+        .filter(candidate => candidate.score > 0) // Only show compatible role candidates
         .sort((a, b) => b.score - a.score) // Sort by match score
         .slice(0, 10); // Top 10 matches
 
@@ -173,7 +492,33 @@ export default async function handler(req, res) {
       };
     });
 
-    // Step 5: Calculate dashboard statistics
+    // Step 5: Prepare candidate pool data (all candidates with interviews)
+    const candidatePool = candidates
+      .map(candidate => {
+        const candidateInterview = candidateInterviews[candidate._id.toString()];
+        if (!candidateInterview) return null; // Only include interviewed candidates
+        
+        return {
+          id: candidate._id.toString(),
+          name: candidate.name || candidate.fullName || candidate.email.split('@')[0],
+          email: candidate.email,
+          experience_years: candidate.experience_years || 0,
+          overallRating: candidateInterview.overall_rating || 0,
+          role: candidateInterview.role || 'Not specified',
+          verified: !!(candidate.linkedin || candidate.github),
+          hasInterview: true,
+          linkedin: candidate.linkedin || null,
+          github: candidate.github || null,
+          phone: candidate.phone || null,
+          interviewDate: candidateInterview.completed_at || null,
+          competencyScores: candidateInterview.competency_scores || {},
+          professionalSummary: candidateInterview.professional_summary || 'No summary available'
+        };
+      })
+      .filter(candidate => candidate !== null) // Remove null entries
+      .sort((a, b) => b.overallRating - a.overallRating); // Sort by interview rating
+
+    // Step 6: Calculate dashboard statistics
     const totalJobs = jobs.length;
     const activeJobs = jobs.filter(job => job.is_active !== false).length;
     const totalCandidatesWithInterviews = interviews.length;
@@ -207,7 +552,13 @@ export default async function handler(req, res) {
         company: recruiter.company
       },
       jobs: jobsWithMatches,
-      stats: dashboardStats
+      stats: dashboardStats,
+      candidatePool: candidatePool,
+      metadata: {
+        algorithm_version: "v2.0_enhanced_with_role_filtering",
+        matching_weights: "65% role + 25% skills + 10% experience",
+        last_updated: new Date()
+      }
     });
 
   } catch (error) {

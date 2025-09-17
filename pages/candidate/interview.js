@@ -1,4 +1,4 @@
-// Main interview page where candidates answer AI-generated questions
+// Fixed: pages/candidate/interview.js - Now loads roles from API
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import ProtectedRoute from '../../components/ProtectedRoute';
@@ -13,6 +13,11 @@ export default function InterviewPage() {
   const [stage, setStage] = useState('setup'); // setup, questions, assessment, complete
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // NEW: Role loading state
+  const [availableRoles, setAvailableRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [rolesError, setRolesError] = useState(null);
   
   // Candidate info
   const [candidateInfo, setCandidateInfo] = useState({
@@ -37,6 +42,48 @@ export default function InterviewPage() {
     if (email) {
       setCandidateInfo(prev => ({ ...prev, email }));
     }
+  }, []);
+
+  // NEW: Load available roles on component mount
+  useEffect(() => {
+    const loadRoles = async () => {
+      try {
+        setRolesLoading(true);
+        setRolesError(null);
+        
+        const response = await fetch('/api/ai/roles');
+        const data = await response.json();
+        
+        if (data.success && data.roles) {
+          // Convert roles object to array for dropdown
+          const rolesList = Object.values(data.roles).map(role => ({
+            key: Object.keys(data.roles).find(key => data.roles[key] === role),
+            name: role.name || role.key
+          }));
+          
+          setAvailableRoles(rolesList);
+          console.log(`✅ Loaded ${rolesList.length} roles from API`);
+        } else {
+          throw new Error(data.error || 'Failed to load roles');
+        }
+      } catch (err) {
+        console.error('Error loading roles:', err);
+        setRolesError(err.message);
+        
+        // FALLBACK: Use a basic set of roles if API fails
+        setAvailableRoles([
+          { key: 'data_analyst', name: 'Data Analyst' },
+          { key: 'software_developer', name: 'Software Developer' },
+          { key: 'sales_manager', name: 'Sales Manager' },
+          { key: 'frontend_developer', name: 'Frontend Developer' },
+          { key: 'backend_developer', name: 'Backend Developer' }
+        ]);
+      } finally {
+        setRolesLoading(false);
+      }
+    };
+    
+    loadRoles();
   }, []);
   
   // Start interview
@@ -168,6 +215,13 @@ export default function InterviewPage() {
               {error}
             </div>
           )}
+
+          {/* Roles Loading Error */}
+          {rolesError && (
+            <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6">
+              ⚠️ {rolesError} - Using fallback roles.
+            </div>
+          )}
           
           {/* Setup Stage */}
           {stage === 'setup' && (
@@ -179,16 +233,34 @@ export default function InterviewPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Job Title / Role
                   </label>
+                  
+                  {/* FIXED: Dynamic role dropdown */}
                   <select
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     value={candidateInfo.job_title}
                     onChange={(e) => setCandidateInfo({...candidateInfo, job_title: e.target.value})}
+                    disabled={rolesLoading}
                   >
-                    <option value="">Select a role...</option>
-                    <option value="Data Analyst">Data Analyst</option>
-                    <option value="Software Developer">Software Developer</option>
-                    <option value="Frontend Developer">Frontend Developer</option>
+                    <option value="">
+                      {rolesLoading ? 'Loading roles...' : 'Select a role...'}
+                    </option>
+                    
+                    {availableRoles.map(role => (
+                      <option key={role.key} value={role.name}>
+                        {role.name}
+                      </option>
+                    ))}
                   </select>
+
+                  {rolesLoading && (
+                    <p className="text-sm text-gray-500 mt-1">Loading available roles...</p>
+                  )}
+                  
+                  {!rolesLoading && availableRoles.length > 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      {availableRoles.length} roles available including Sales Manager
+                    </p>
+                  )}
                 </div>
                 
                 <div>
@@ -222,10 +294,10 @@ export default function InterviewPage() {
               
               <button
                 onClick={handleStartInterview}
-                disabled={loading || !candidateInfo.job_title || !candidateInfo.skills || !candidateInfo.experience}
+                disabled={loading || rolesLoading || !candidateInfo.job_title || !candidateInfo.skills || !candidateInfo.experience}
                 className="mt-6 w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
               >
-                {loading ? 'Starting Interview...' : 'Start Interview'}
+                {loading ? 'Starting Interview...' : rolesLoading ? 'Loading...' : 'Start Interview'}
               </button>
             </div>
           )}

@@ -15,8 +15,11 @@ router.post('/register', async (req, res) => {
     
     console.log('Register attempt:', { email, userType });
     
+    // Normalize email to lowercase
+    const normalizedEmail = email.toLowerCase();
+    
     // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({ 
         success: false, 
@@ -30,7 +33,7 @@ router.post('/register', async (req, res) => {
 
     // Create user account
     const user = new User({
-      email: email.toLowerCase(),
+      email: normalizedEmail,  // Always lowercase
       password: hashedPassword,
       userType
     });
@@ -39,22 +42,23 @@ router.post('/register', async (req, res) => {
 
     // Create profile based on user type
     if (userType === 'candidate') {
+      // Remove email and password fields from profileData
+      const { email: _, password: __, confirmPassword: ___, ...cleanProfileData } = profileData;
+      
       const candidate = new Candidate({
         userId: user._id,
-        email: user.email,
-        ...profileData,
-        // Remove password fields from profile
-        password: undefined,
-        confirmPassword: undefined
+        email: normalizedEmail,  // Use the same lowercase email
+        ...cleanProfileData,     // Use cleaned profile data
       });
       await candidate.save();
     } else if (userType === 'recruiter') {
+      // Remove email and password fields from profileData
+      const { email: _, password: __, confirmPassword: ___, ...cleanProfileData } = profileData;
+      
       const recruiter = new Recruiter({
         userId: user._id,
-        ...profileData,
-        // Remove password fields from profile
-        password: undefined,
-        confirmPassword: undefined
+        email: normalizedEmail,  // Use the same lowercase email
+        ...cleanProfileData,     // Use cleaned profile data
       });
       await recruiter.save();
     }
@@ -64,7 +68,7 @@ router.post('/register', async (req, res) => {
       { 
         userId: user._id, 
         userType: user.userType,
-        email: user.email 
+        email: normalizedEmail  // Token also uses lowercase
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
@@ -76,7 +80,7 @@ router.post('/register', async (req, res) => {
       token,
       user: {
         id: user._id,
-        email: user.email,
+        email: normalizedEmail,  // Return lowercase email
         userType: user.userType
       }
     });
@@ -97,8 +101,14 @@ router.post('/login', async (req, res) => {
     
     console.log('Login attempt:', email);
 
-    // Find user
-    const user = await User.findOne({ email: email.toLowerCase() });
+    // Normalize email for lookup
+    const normalizedEmail = email.toLowerCase();
+
+    // Find user with case-insensitive search (extra safety)
+    const user = await User.findOne({ 
+      email: { $regex: new RegExp(`^${normalizedEmail}$`, 'i') }
+    });
+    
     if (!user) {
       return res.status(401).json({ 
         success: false, 
@@ -119,12 +129,12 @@ router.post('/login', async (req, res) => {
     user.lastLogin = new Date();
     await user.save();
 
-    // Generate JWT token
+    // Generate JWT token with normalized email
     const token = jwt.sign(
       { 
         userId: user._id, 
         userType: user.userType,
-        email: user.email 
+        email: user.email  // This is already lowercase from DB
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
@@ -136,7 +146,7 @@ router.post('/login', async (req, res) => {
       token,
       user: {
         id: user._id,
-        email: user.email,
+        email: user.email,  // Lowercase from DB
         userType: user.userType
       }
     });
@@ -163,4 +173,3 @@ router.get('/me', auth, (req, res) => {
 });
 
 export default router;
-

@@ -1,3 +1,5 @@
+
+/// pages/api
 export default async function handler(req, res) {
   const AI_BASE_URL = process.env.NEXT_PUBLIC_AI_BASE_URL || 'http://localhost:5001';
   

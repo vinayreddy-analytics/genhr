@@ -1,5 +1,4 @@
-// Conversational AI Interview - Your actual vision
-// Save as: pages/candidate/ai-interview.js
+// Fixed: pages/candidate/ai-interview.js - Now loads roles from API
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
@@ -12,6 +11,11 @@ export default function AIInterviewConversational() {
   const [stage, setStage] = useState('setup'); // setup, introduction, interview, complete
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // NEW: Role loading state
+  const [availableRoles, setAvailableRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(true);
+  const [rolesError, setRolesError] = useState(null);
   
   // Interview state
   const [interviewState, setInterviewState] = useState(null);
@@ -30,17 +34,59 @@ export default function AIInterviewConversational() {
     experience: '',
     skills: ''
   });
-  // Add this useEffect near the top with other hooks
-useEffect(() => {
-  if (stage === 'complete') {
-    // Auto-redirect after 3 seconds
-    const timer = setTimeout(() => {
-      router.push('/candidate-dashboard');
-    }, 3000);
+
+  // NEW: Load available roles on component mount
+  useEffect(() => {
+    const loadRoles = async () => {
+      try {
+        setRolesLoading(true);
+        setRolesError(null);
+        
+        const response = await fetch('/api/ai/roles');
+        const data = await response.json();
+        
+        if (data.success && data.roles) {
+          // Convert roles object to array for dropdown
+          const rolesList = Object.values(data.roles).map(role => ({
+            key: Object.keys(data.roles).find(key => data.roles[key] === role),
+            name: role.name || role.key
+          }));
+          
+          setAvailableRoles(rolesList);
+          console.log(`✅ Loaded ${rolesList.length} roles from API`);
+        } else {
+          throw new Error(data.error || 'Failed to load roles');
+        }
+      } catch (err) {
+        console.error('Error loading roles:', err);
+        setRolesError(err.message);
+        
+        // FALLBACK: Use a basic set of roles if API fails
+        setAvailableRoles([
+          { key: 'data_analyst', name: 'Data Analyst' },
+          { key: 'software_developer', name: 'Software Developer' },
+          { key: 'sales_manager', name: 'Sales Manager' },
+          { key: 'frontend_developer', name: 'Frontend Developer' }
+        ]);
+      } finally {
+        setRolesLoading(false);
+      }
+    };
     
-    return () => clearTimeout(timer);
-  }
-}, [stage, router]);
+    loadRoles();
+  }, []);
+
+  // Add this useEffect near the top with other hooks
+  useEffect(() => {
+    if (stage === 'complete') {
+      // Auto-redirect after 3 seconds
+      const timer = setTimeout(() => {
+        router.push('/candidate-dashboard');
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [stage, router]);
   
   // Start the conversational interview
   const startInterview = async () => {
@@ -162,6 +208,13 @@ useEffect(() => {
               <p className="text-red-700">{error}</p>
             </div>
           )}
+
+          {/* Roles Loading Error */}
+          {rolesError && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6">
+              <p className="text-yellow-700">⚠️ {rolesError} - Using fallback roles.</p>
+            </div>
+          )}
           
           {/* Setup Stage */}
           {stage === 'setup' && (
@@ -190,21 +243,34 @@ useEffect(() => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Position Applying For
                   </label>
+                  
+                  {/* FIXED: Dynamic role dropdown */}
                   <select
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"
                     value={candidateInfo.job_title}
                     onChange={(e) => setCandidateInfo({...candidateInfo, job_title: e.target.value})}
+                    disabled={rolesLoading}
                   >
-                    <option value="">Select a position...</option>
-                    <option value="Data Analyst">Data Analyst</option>
-                    <option value="Data Scientist">Data Scientist</option>
-                    <option value="Software Developer">Software Developer</option>
-                    <option value="Frontend Developer">Frontend Developer</option>
-                    <option value="Backend Developer">Backend Developer</option>
-                    <option value="Full Stack Developer">Full Stack Developer</option>
-                    <option value="DevOps Engineer">DevOps Engineer</option>
-                    <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                    <option value="">
+                      {rolesLoading ? 'Loading positions...' : 'Select a position...'}
+                    </option>
+                    
+                    {availableRoles.map(role => (
+                      <option key={role.key} value={role.name}>
+                        {role.name}
+                      </option>
+                    ))}
                   </select>
+                  
+                  {rolesLoading && (
+                    <p className="text-sm text-gray-500 mt-1">Loading available positions...</p>
+                  )}
+                  
+                  {!rolesLoading && availableRoles.length > 0 && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      {availableRoles.length} positions available
+                    </p>
+                  )}
                 </div>
                 
                 <div>
@@ -248,14 +314,15 @@ useEffect(() => {
               
               <button
                 onClick={startInterview}
-                disabled={loading || !candidateInfo.name || !candidateInfo.job_title || !candidateInfo.experience}
+                disabled={loading || rolesLoading || !candidateInfo.name || !candidateInfo.job_title || !candidateInfo.experience}
                 className="mt-6 w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all"
               >
-                {loading ? 'Starting Interview...' : 'Begin Interview'}
+                {loading ? 'Starting Interview...' : rolesLoading ? 'Loading...' : 'Begin Interview'}
               </button>
             </div>
           )}
           
+          {/* Rest of your existing stages remain unchanged */}
           {/* Introduction Stage */}
           {stage === 'introduction' && (
             <div className="bg-white shadow-lg rounded-lg p-8">

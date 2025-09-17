@@ -12,21 +12,191 @@
     "sample_questions": {
       "basic": [
         {
-          "question": "How would you clean a dataset with missing values?",
+          "question": "You have a CSV file with customer data where 20% of the 'age' column has missing values. Walk me through how you would handle this missing data.",
           "time_limit": 90,
           "scoring_focus": ["correctness", "clarity"]
         }
       ],
       "intermediate": [
         {
-          "question": "How would you detect and handle outliers in customer purchase data?",
+          "question": "Your company's e-commerce conversion rate dropped from 3.2% to 2.8% last month. You have access to Google Analytics, customer behavior data, and transaction logs. How would you investigate this decline?",
           "time_limit": 105,
           "scoring_focus": ["correctness", "completeness", "relevance"]
         }
       ],
       "expert": [
         {
-          "question": "Design an end-to-end analytics pipeline for real-time customer behavior tracking.",
+          "question": "Design a real-time analytics system to predict customer churn with 85%+ accuracy. Include data sources, feature engineering approach, model selection, and deployment strategy.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "business_analyst": {
+    "name": "Business Analyst",
+    "core_skills": ["Requirements Analysis", "Process Mapping", "Stakeholder Management", "Business Process", "Documentation", "Gap Analysis"],
+    "tools": ["Visio", "JIRA", "Confluence", "Excel", "PowerPoint", "SharePoint", "Lucidchart"],
+    "scenario_contexts": ["process-improvement", "system-implementation", "change-management", "requirement-gathering", "business-transformation"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "A department manager complains that their monthly reporting process takes 3 full days to complete. How would you approach analyzing this process?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Your company wants to implement a new CRM system. Multiple departments have different requirements and some are resistant to change. How would you manage the requirements gathering and stakeholder alignment?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a business transformation strategy for a traditional retail company moving to digital-first operations. Include stakeholder analysis, change management approach, and success metrics.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "financial_analyst": {
+    "name": "Financial Analyst",
+    "core_skills": ["Financial Modeling", "Excel", "Forecasting", "Budgeting", "Variance Analysis", "Financial Reporting", "Valuation"],
+    "tools": ["Excel", "Bloomberg", "SAP", "Tableau", "Power BI", "QuickBooks", "SQL"],
+    "scenario_contexts": ["budget-planning", "financial-forecasting", "investment-analysis", "cost-management", "performance-analysis"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "You notice that departmental expenses are 15% over budget for the quarter. How would you analyze what's driving this variance?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Your company is considering acquiring a competitor for $50M. Walk me through how you would build a financial model to evaluate this acquisition.",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a comprehensive financial planning and analysis framework for a high-growth SaaS company preparing for IPO. Include KPIs, forecasting models, and investor reporting structure.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "data_engineer": {
+    "name": "Data Engineer",
+    "core_skills": ["Python", "SQL", "Apache Spark", "Kafka", "Docker", "Cloud Platforms", "ETL/ELT", "Data Warehousing"],
+    "tools": ["Airflow", "Databricks", "Snowflake", "AWS", "GCP", "Kubernetes", "Jenkins", "Git"],
+    "scenario_contexts": ["data-pipeline", "real-time-processing", "cloud-migration", "data-warehouse", "streaming-analytics"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "You need to move customer data from a MySQL database to a data warehouse every night. How would you design this data pipeline?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Your company processes 100GB of transaction data daily, but the current batch processing system is too slow. How would you redesign it for real-time processing?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a scalable data architecture for a fintech company handling millions of transactions daily. Include real-time fraud detection, regulatory compliance, and disaster recovery.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "data_scientist": {
+    "name": "Data Scientist",
+    "core_skills": ["Python", "Machine Learning", "Statistics", "Deep Learning", "Feature Engineering", "Model Deployment", "A/B Testing"],
+    "tools": ["Jupyter", "TensorFlow", "PyTorch", "scikit-learn", "MLflow", "Docker", "Git"],
+    "scenario_contexts": ["predictive-modeling", "recommendation-systems", "nlp", "computer-vision", "time-series", "optimization"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "You want to predict which customers are likely to cancel their subscription. What machine learning approach would you use and what features would you consider?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Your recommendation model has 65% accuracy but takes 2 seconds to make predictions. The business needs sub-200ms response time. How would you optimize this?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design an end-to-end ML system for dynamic pricing in ride-sharing that considers demand, supply, traffic, weather, and events. Include model architecture, A/B testing, and monitoring strategy.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "backend_developer": {
+    "name": "Backend Developer",
+    "core_skills": ["API Design", "Database Design", "System Architecture", "Security", "Performance Optimization", "Microservices", "Cloud Services"],
+    "tools": ["Node.js", "Python", "Java", "PostgreSQL", "MongoDB", "Docker", "Kubernetes", "AWS"],
+    "scenario_contexts": ["api-development", "microservices", "database-optimization", "system-scaling", "security-implementation"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "You're building a REST API for a blog application. How would you design the endpoints for managing blog posts and comments?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Your API is experiencing 5-second response times during peak hours when handling 10,000 concurrent users. How would you diagnose and solve this performance issue?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a distributed backend system for a social media platform with 50M users. Include database sharding, caching strategy, real-time notifications, and content delivery.",
           "time_limit": 120,
           "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
         }
@@ -46,21 +216,21 @@
     "sample_questions": {
       "basic": [
         {
-          "question": "Explain the difference between let, const, and var in JavaScript.",
+          "question": "Explain the difference between let, const, and var in JavaScript and when you would use each.",
           "time_limit": 90,
           "scoring_focus": ["correctness", "clarity"]
         }
       ],
       "intermediate": [
         {
-          "question": "How would you design a scalable user authentication system?",
+          "question": "How would you design a scalable user authentication system that handles login, registration, password reset, and session management?",
           "time_limit": 105,
           "scoring_focus": ["correctness", "completeness", "relevance"]
         }
       ],
       "expert": [
         {
-          "question": "Design a distributed system architecture for handling millions of users.",
+          "question": "Design a distributed system architecture for handling millions of users with real-time features. Include load balancing, data consistency, and fault tolerance strategies.",
           "time_limit": 120,
           "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
         }
@@ -80,21 +250,293 @@
     "sample_questions": {
       "basic": [
         {
-          "question": "How do you ensure your website works across different browsers?",
+          "question": "How do you ensure your website works consistently across different browsers and devices?",
           "time_limit": 90,
           "scoring_focus": ["correctness", "clarity"]
         }
       ],
       "intermediate": [
         {
-          "question": "How would you optimize a React application that's loading slowly?",
+          "question": "Your React application takes 8 seconds to load and users are complaining. How would you diagnose and optimize the performance?",
           "time_limit": 105,
           "scoring_focus": ["correctness", "completeness", "relevance"]
         }
       ],
       "expert": [
         {
-          "question": "Design a micro-frontend architecture for a large-scale application.",
+          "question": "Design a micro-frontend architecture for a large enterprise application with multiple teams. Include code sharing, deployment strategies, and state management.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "project_manager": {
+    "name": "Project Manager",
+    "core_skills": ["Project Planning", "Risk Management", "Stakeholder Communication", "Budget Management", "Team Leadership", "Agile/Scrum"],
+    "tools": ["JIRA", "Asana", "Microsoft Project", "Slack", "Confluence", "Excel", "Gantt Charts"],
+    "scenario_contexts": ["project-delivery", "stakeholder-management", "risk-mitigation", "team-coordination", "budget-control"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "Your project is 2 weeks behind schedule and the client is asking for a status update. How would you handle this situation?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "You're managing a 6-month software development project with 3 different teams across 2 time zones. The scope has increased by 30% but the deadline remains fixed. How do you manage this?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a project management framework for a digital transformation initiative affecting 500+ employees across 5 departments. Include change management, stakeholder alignment, and success metrics.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "technical_project_manager": {
+    "name": "Technical Project Manager",
+    "core_skills": ["Technical Architecture", "Software Development Lifecycle", "API Management", "DevOps", "Agile", "Risk Assessment", "Team Leadership"],
+    "tools": ["JIRA", "Git", "Docker", "Jenkins", "AWS", "Slack", "Confluence", "Postman"],
+    "scenario_contexts": ["software-delivery", "system-integration", "technical-architecture", "deployment-management", "performance-optimization"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "Your development team is struggling to meet sprint commitments due to technical debt. How would you address this with stakeholders?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "You're managing a microservices migration project with 8 services and 4 development teams. The system needs to remain operational during migration. What's your approach?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Plan a cloud-native architecture transformation for a legacy monolith serving 10M users. Include technical roadmap, team coordination, risk mitigation, and zero-downtime deployment strategy.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "sales_manager": {
+    "name": "Sales Manager",
+    "core_skills": ["Team Leadership", "Sales Strategy", "Performance Management", "CRM", "Customer Relations", "Territory Management", "Negotiation"],
+    "tools": ["Salesforce", "HubSpot", "Excel", "LinkedIn Sales Navigator", "Zoom", "Slack", "PowerPoint"],
+    "scenario_contexts": ["team-performance", "client-retention", "territory-expansion", "sales-forecasting", "pipeline-management"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "Your sales team missed their quarterly target by 20%. Two reps exceeded goals, two hit 80%, and one achieved only 60%. How would you address this?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Your company's main competitor just launched a similar product at 30% lower price. Three major clients are reconsidering their contracts. What's your strategy?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a comprehensive sales strategy for entering a new geographic market with different business culture and competitive landscape. Include team structure, training program, and success metrics.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "retail_store_manager": {
+    "name": "Retail Store Manager",
+    "core_skills": ["Team Management", "Inventory Management", "Customer Service", "Sales Management", "Visual Merchandising", "Staff Training", "P&L Management"],
+    "tools": ["POS Systems", "Inventory Management Software", "Excel", "Scheduling Software", "CRM", "Social Media"],
+    "scenario_contexts": ["customer-service", "inventory-control", "team-management", "sales-optimization", "seasonal-planning"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "A regular customer is complaining about a defective product they bought 3 weeks ago, but you don't have the exact item in stock for replacement. How do you handle this?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Your store's sales are down 15% this quarter, foot traffic is declining, and you have excess inventory in certain categories. Develop an action plan to improve performance.",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "You're opening a new store location in a competitive market. Design a comprehensive launch strategy including staff hiring, inventory planning, marketing, and first-year performance targets.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "mechanical_engineer": {
+    "name": "Mechanical Engineer",
+    "core_skills": ["CAD Design", "Materials Science", "Thermodynamics", "Manufacturing Processes", "Problem Solving", "Quality Control", "Project Management"],
+    "tools": ["SolidWorks", "AutoCAD", "MATLAB", "ANSYS", "3D Printing", "CNC Programming", "Excel"],
+    "scenario_contexts": ["product-design", "manufacturing-optimization", "failure-analysis", "cost-reduction", "quality-improvement"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "A plastic component in your product is failing quality tests due to stress fractures. What steps would you take to investigate and solve this problem?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Your manufacturing cost per unit is 25% higher than competitors. The design is complex with 15 parts requiring assembly. How would you redesign for cost optimization without compromising quality?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a complete mechanical system for an autonomous vehicle's braking mechanism. Include safety redundancies, performance requirements, manufacturing considerations, and testing protocols.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "design_technician": {
+    "name": "Design Technician",
+    "core_skills": ["Technical Drawing", "CAD Software", "Blueprint Reading", "Geometric Dimensioning", "Manufacturing Knowledge", "Quality Standards", "Documentation"],
+    "tools": ["AutoCAD", "SolidWorks", "Inventor", "Drafting Tools", "3D Modeling", "PLM Software"],
+    "scenario_contexts": ["technical-documentation", "design-modification", "manufacturing-support", "quality-control", "prototype-development"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "An engineer has sketched a new component design on paper. How would you convert this into a detailed technical drawing ready for manufacturing?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "Manufacturing reports that a part you designed is difficult to produce and causing quality issues. The tolerance requirements are tight. How would you modify the design?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Lead the technical documentation process for a complex assembly with 50+ components across multiple manufacturing processes. Include drawing standards, revision control, and cross-functional coordination.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "customer_care_representative": {
+    "name": "Customer Care Representative",
+    "core_skills": ["Communication", "Problem Solving", "Empathy", "Product Knowledge", "Conflict Resolution", "CRM Software", "Multi-tasking"],
+    "tools": ["CRM Systems", "Help Desk Software", "Chat Platforms", "Phone Systems", "Knowledge Base", "Ticketing Systems"],
+    "scenario_contexts": ["complaint-resolution", "product-support", "order-issues", "billing-inquiries", "technical-assistance"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "A customer calls saying their order arrived damaged and they need it urgently for an event tomorrow. You don't have the item in stock. How do you handle this?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "You're handling a customer who received the wrong product twice and is extremely frustrated, threatening to leave negative reviews. They're demanding a full refund plus compensation. How do you resolve this?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Design a customer service protocol for handling a product recall affecting 10,000 customers. Include communication strategy, resolution process, and quality assurance measures.",
+          "time_limit": 120,
+          "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
+        }
+      ]
+    }
+  },
+  "sales_executive": {
+    "name": "Sales Executive",
+    "core_skills": ["Prospecting", "Relationship Building", "Negotiation", "Product Knowledge", "CRM", "Cold Calling", "Presentation Skills"],
+    "tools": ["Salesforce", "LinkedIn Sales Navigator", "CRM", "Email Marketing", "Zoom", "PowerPoint", "Excel"],
+    "scenario_contexts": ["lead-generation", "client-meetings", "proposal-presentation", "objection-handling", "deal-closing"],
+    "time_expectations": {
+      "basic": {"technical": 90, "behavioral": 120},
+      "intermediate": {"technical": 105, "behavioral": 120},
+      "expert": {"technical": 120, "behavioral": 120}
+    },
+    "sample_questions": {
+      "basic": [
+        {
+          "question": "You're presenting to a potential client who says 'Your product is too expensive compared to competitors.' How would you respond to this objection?",
+          "time_limit": 90,
+          "scoring_focus": ["correctness", "clarity"]
+        }
+      ],
+      "intermediate": [
+        {
+          "question": "You've been nurturing a high-value prospect for 3 months. They seem interested but keep delaying the decision, citing budget concerns and internal approvals. How do you move this forward?",
+          "time_limit": 105,
+          "scoring_focus": ["correctness", "completeness", "relevance"]
+        }
+      ],
+      "expert": [
+        {
+          "question": "Develop a comprehensive sales strategy for penetrating a new industry vertical where you have no existing relationships. Include prospecting methods, value proposition development, and pipeline management.",
           "time_limit": 120,
           "scoring_focus": ["correctness", "completeness", "clarity", "relevance"]
         }

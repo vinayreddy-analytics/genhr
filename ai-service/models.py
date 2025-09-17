@@ -490,6 +490,14 @@ class Interview:
         if not session_data:
             raise ValueError("session_data required")
 
+        print("🔍 MODELS DEBUG: Saving interview with summary keys:", list(summary.keys()))
+        
+        if 'enhanced_skills' in summary:
+            enhanced = summary['enhanced_skills']
+            print(f"✅ Enhanced skills in summary: {len(enhanced.get('verified_skills', []))} skills")
+        else:
+            print("❌ No enhanced_skills in summary!")
+
         transcript = session_data.get('state', {}).get('transcript', [])
         candidate_info = session_data.get('candidate_info', {})
         candidate_id = session_data.get('candidate_id')
@@ -504,17 +512,20 @@ class Interview:
                 experience_years=candidate_info.get('experience', '0')
             )
 
-        # Create main interview record (NO DUPLICATED SKILLS DATA)
+        # Create main interview record - FIXED: Include enhanced_skills
         interview_data = {
             'candidate_id': candidate_id,
             'session_id': session_data['_id'],  # Keep string for UI compatibility
             'role': candidate_info.get('job_title', 'Unknown'),
             'status': 'completed',
             
-            # Core Results - NO skill duplication
+            # Core Results - FIXED: Include enhanced_skills from Phase 2
             'professional_summary': summary.get('professional_summary', ''),
             'overall_rating': float(summary.get('overall_rating', 0)),
             'competency_scores': summary.get('competency_scores', {}),
+            
+            # 🔧 PHASE 2 FIX: Add enhanced_skills field
+            'enhanced_skills': summary.get('enhanced_skills', {}),
             
             # Business Intelligence Fields
             'strengths': summary.get('strengths', [])[:5],  # Limit to top 5
@@ -536,6 +547,12 @@ class Interview:
             'recruiter_notes': '',
             'recruiter_card': f"{candidate_info.get('name', 'Candidate')} • {candidate_info.get('job_title', 'Role')} • {', '.join(summary.get('strengths', [])[:3])} • {int(summary.get('overall_rating', 0))}/100"
         }
+
+        print("🔍 MODELS DEBUG: Final doc keys being saved:", list(interview_data.keys()))
+        if 'enhanced_skills' in interview_data:
+            print("✅ enhanced_skills will be saved")
+        else:
+            print("❌ enhanced_skills missing from final doc!")
 
         # Insert main interview record
         interview_result = interviews_collection.insert_one(interview_data)

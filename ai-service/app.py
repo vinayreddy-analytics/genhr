@@ -8,6 +8,9 @@ from interview import (
     conduct_interview, start_skill_assessment, load_available_roles,
     conduct_interview_start_enhanced, conduct_interview_reply_enhanced
 )
+from ml_similarity import SkillSimilarityEngine
+import numpy as np
+
 
 # Optional database integration
 try:
@@ -193,6 +196,33 @@ def dynamic_interview_reply():
         
         # Call the ENHANCED version
         result = conduct_interview_reply_enhanced(state, answer, time_taken_sec)
+        if result.get('completed'):
+            summary = result.get('summary', {})
+            print("=" * 60)
+            print("🧪 DEBUGGING ENHANCED SUMMARY:")
+            print(f"Summary keys: {list(summary.keys())}")
+            
+            # Check for enhanced_skills field
+            if 'enhanced_skills' in summary:
+                enhanced = summary['enhanced_skills']
+                print(f"✅ enhanced_skills found!")
+                print(f"   - verified_skills: {len(enhanced.get('verified_skills', []))} skills")
+                print(f"   - searchable_tags: {len(enhanced.get('searchable_tags', []))} tags")
+                
+                # Print first few skills
+                skills = enhanced.get('verified_skills', [])
+                for i, skill in enumerate(skills[:3]):
+                    print(f"   - Skill {i+1}: {skill.get('display_name')} ({skill.get('score')}/100)")
+            else:
+                print("❌ enhanced_skills field MISSING from summary!")
+                print("Available fields:", list(summary.keys()))
+            
+            # Check for old fields too
+            if 'matching_keywords' in summary:
+                print(f"📋 matching_keywords: {summary['matching_keywords']}")
+            
+            print("=" * 60)
+
         
         # DEBUG: Check what's in the result
         print(f"DEBUG: Result keys: {result.keys()}")
@@ -261,6 +291,45 @@ def get_roles():
             'roles': roles
         })
     except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/ml/skill-similarity', methods=['POST'])
+def calculate_ml_skill_similarity():
+    """Calculate ML-powered skill similarity"""
+    try:
+        data = request.get_json()
+        job_skills = data.get('job_skills', [])
+        candidate_enhanced_skills = data.get('candidate_enhanced_skills', {})
+        
+        if not job_skills:
+            return jsonify({'success': False, 'error': 'job_skills required'}), 400
+        
+        # Initialize ML engine
+        similarity_engine = SkillSimilarityEngine()
+        
+        # Extract candidate skills from enhanced_skills structure
+        candidate_skills = []
+        if candidate_enhanced_skills and 'verified_skills' in candidate_enhanced_skills:
+            for skill in candidate_enhanced_skills['verified_skills']:
+                candidate_skills.append(skill.get('display_name', skill.get('skill', '')))
+        
+        if not candidate_skills:
+            return jsonify({
+                'success': True,
+                'similarity_result': {'overall_score': 0, 'matches': [], 'coverage': 0, 'method': 'no_skills'}
+            })
+        
+        # Calculate ML similarity
+        result = similarity_engine.calculate_skill_similarity(job_skills, candidate_skills)
+        result['method'] = 'ml_similarity'
+        
+        return jsonify({
+            'success': True,
+            'similarity_result': result
+        })
+        
+    except Exception as e:
+        print(f"ML similarity error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # Enhanced recruiter endpoints (if database available)

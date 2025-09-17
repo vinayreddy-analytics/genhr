@@ -122,17 +122,23 @@ export default async function handler(req, res) {
 
     console.log(`✅ Found interview for: ${candidate.email}`);
 
-    // Step 3: Handle missing or empty skill_ratings by transforming competency_scores
+// Step 3: Handle missing or empty skill_ratings by transforming competency_scores
     let verifiedSkills = [];
     let skillSummary = { total_skills: 0, expert_skills: 0, advanced_skills: 0, average_score: 0 };
 
-    if (latestInterview.skill_ratings && latestInterview.skill_ratings.verified_skills && latestInterview.skill_ratings.verified_skills.length > 0) {
-      // Use existing skill_ratings if available
+    // FIXED: Check for enhanced_skills first (Phase 2), then skill_ratings (legacy)
+    if (latestInterview.enhanced_skills && latestInterview.enhanced_skills.verified_skills && latestInterview.enhanced_skills.verified_skills.length > 0) {
+      // Use Phase 2 enhanced_skills data
+      verifiedSkills = latestInterview.enhanced_skills.verified_skills;
+      skillSummary = latestInterview.enhanced_skills.skill_summary || skillSummary;
+      console.log('✅ Using Phase 2 enhanced_skills data');
+    } else if (latestInterview.skill_ratings && latestInterview.skill_ratings.verified_skills && latestInterview.skill_ratings.verified_skills.length > 0) {
+      // Use legacy skill_ratings if available
       verifiedSkills = latestInterview.skill_ratings.verified_skills;
       skillSummary = latestInterview.skill_ratings.skill_summary || skillSummary;
-      console.log('✅ Using existing skill_ratings data');
+      console.log('✅ Using legacy skill_ratings data');
     } else if (latestInterview.competency_scores) {
-      // Transform competency_scores into skills format
+      // Transform competency_scores into skills format as final fallback
       console.log('🔄 Transforming competency_scores into skills format');
       verifiedSkills = createSkillsFromCompetencyScores(latestInterview.competency_scores);
       
