@@ -371,6 +371,14 @@ def validate_skill_name(skill_name, role="Data Analyst"):
             return True, category
     
     return False, "unknown"
+    
+def normalize_skill(skill_name):
+    """Normalize skill using TOOL_PATTERNS mapping"""
+    skill_lower = skill_name.lower().strip()
+    for standard_name, variants in TOOL_PATTERNS.items():
+        if skill_lower in variants:
+            return standard_name
+    return skill_lower
 
 def clean_skill_data(skill_ratings, role="Data Analyst"):
     """Clean and validate skill ratings data"""

@@ -100,7 +100,7 @@ async function calculateMLSkillMatchCached(jobSkills, candidateInterview) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         job_skills: jobSkills,
-        candidate_enhanced_skills: candidateInterview.enhanced_skills
+        candidate_enhanced_skills: candidateInterview.enhanced_skills.verified_skills?.map(s => s.display_name) || []
       })
     });
     

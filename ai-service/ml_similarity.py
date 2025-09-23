@@ -49,14 +49,12 @@ class SkillSimilarityEngine:
         # Calculate similarity matrix
         similarity_matrix = cosine_similarity(job_embeddings, candidate_embeddings)
         
-        # Find best matches for each job requirement
         matches = []
         total_similarity = 0.0
         
         for i, job_skill in enumerate(job_skills):
-            # Find best matching candidate skill
-            best_match_idx = int(np.argmax(similarity_matrix[i]))  # Convert to Python int
-            best_similarity = float(similarity_matrix[i][best_match_idx])  # Convert to Python float
+            best_match_idx = int(np.argmax(similarity_matrix[i])) 
+            best_similarity = float(similarity_matrix[i][best_match_idx])  
             
             match_info = {
                 'job_skill': str(job_skill),
@@ -69,7 +67,6 @@ class SkillSimilarityEngine:
             matches.append(match_info)
             total_similarity += best_similarity
         
-        # Calculate overall metrics
         overall_score = (total_similarity / len(job_skills)) * 100 if job_skills else 0.0
         coverage = len([m for m in matches if m['similarity_score'] >= self.thresholds['weak_match']]) / len(job_skills) * 100
         

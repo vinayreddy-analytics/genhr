@@ -1,0 +1,4 @@
+candidate_name,email,job_role_family,job_skills,baseline_overlap_pct,baseline_final,role_compat,experience_score,semantic_overall_rating,matched_skills,missing_skills
+"Rohan","rohan@gmail.com","Data Analyst","python|sql|tableau","66.67","61.92","60.0","62.5","63.8","python|sql","tableau"
+"Aisha","aisha@gmail.com","Data Analyst","python|sql|tableau","33.33","51.08","60.0","37.5","51.1","python","sql|tableau"
+"Virat","virat@gmail.com","Data Analyst","python|sql|tableau","33.33","51.08","60.0","37.5","52.1","python","sql|tableau"
