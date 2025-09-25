@@ -39,3 +39,26 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# --- Node (any folder) ---
+**/node_modules/
+
+# --- Python virtual envs ---
+.venv/
+venv/
+env/
+**/.venv/
+**/venv/
+ai-service/venv/
+
+# --- Python caches ---
+**/__pycache__/
+**/*.py[cod]
+.ipynb_checkpoints/
+
+# --- Env files (keep only examples) ---
+.env
+.env.*
+!.env.example
+!.env.local.example
+
